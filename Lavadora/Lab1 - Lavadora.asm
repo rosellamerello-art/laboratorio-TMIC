@@ -29,4 +29,27 @@ reset:
 Loop:
       rjmp  Loop
 
+delay_1ms:
+      ldi r18, 21
+d1ms_loop:
+      ldi r17, 253
+d1ms_loop2:
+      dec r17
+      brne d1ms_loop2
+      dec r18
+      brne d1ms_loop
+      ret
       
+delay_seg:
+dseg_loop:
+      ldi r19, 250
+dseg_1000:
+      rcall delay_1ms
+      rcall delay_1ms
+      rcall delay_1ms
+      rcall delay_1ms
+      dec r19
+      brne dseg_1000
+      dec r20
+      brne dseg_loop
+      ret

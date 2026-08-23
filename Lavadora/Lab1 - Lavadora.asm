@@ -20,7 +20,7 @@ reset:
       ldi r16, 0b00000000
       out PORTC, r16
       
-      ldi r16, 0b01000000
+      ldi r16, 0b11000000
       out DDRD, r16
       ldi r16, 0b00001100
       out PORTD, r16
@@ -124,6 +124,98 @@ ac_media:
 ac_done:
       out portc, r16
       ret
+
+lav_giro_tiempo:
+      cpi r23, 0
+      breq lgt_ligera
+      cpi r23, 1
+      breq lgt_media
+      ldi r20, 4
+      ret
+lgt_ligera:
+      ldi r20, 2
+      ret
+lgt_media:
+      ldi r20, 3
+      ret
+      
+lav_pausa_tiempo:
+      cpi r23, 0
+      breq lpt_ligera
+      cpi r23, 1
+      breq lpt_media
+      ldi r20, 3
+      ret      
+lpt_ligera:
+      ldi r20, 1
+      ret
+lpt_media:
+      ldi r20, 2
+      ret
+      
+cent_tiempo:
+      cpi r23, 0
+      breq ct_ligera
+      cpi r23, 1
+      breq ct_media
+      ldi r20, 21
+      ret
+ct_ligera:
+      ldi r20, 15
+      ret
+ct_media:
+      ldi r20, 18
+      ret
+      
+sec_tiempo:
+      cpi r23, 0
+      breq st_ligera
+      cpi r23, 1
+      breq st_media
+      ldi r20, 9
+      ret
+st_ligera:
+      ldi r20, 5
+      ret
+st_media:
+      ldi r20, 7
+      ret
+      
+      
+lavado:
+      ldi r27, 5
+lav_loop:
+      rcall lav_giro_tiempo
+      sbi portd, portd6
+      rcall delay_seg
+      cbi portd, portd6
+      rcall lav_pausa_tiempo
+      rcall delay_seg
+      dec r27
+      brne lav_loop
+      ret
+      
+centrifugado:
+      rcall cent_tiempo
+      rcall blink_motor
+      cbi portd, portd6
+      ret
+      
+secado:
+      sbi portd, portd7
+      rcall sec_tiempo
+      sbi portd, portd6
+      rcall delay_seg
+      cbi portd, portd6
+      rcall sec_tiempo
+      rcall delay_seg
+      cbi portd, portd7
+      rcall sec_tiempo
+      sbi portd, portd6
+      rcall delay_seg
+      cbi portd, portd6
+      ret
+      
 delay_1ms:
       ldi r18, 21
 d1ms_loop:
@@ -156,4 +248,17 @@ dr20_loop:
       dec r20
       brne dr20_loop
       pop r20
+      ret
+      
+blink_motor:
+      mov r28, r20
+bm_loop:
+      sbi portd, portd6
+      ldi r20, 250
+      rcall delay_ms_r20
+      cbi portd, portd6
+      ldi r20, 250
+      rcall delay_ms_r20
+      dec r28
+      brne bm_loop
       ret

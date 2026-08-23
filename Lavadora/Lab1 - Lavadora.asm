@@ -26,7 +26,8 @@ reset:
       out PORTD, r16
       
       ldi r16, 255
-      mov r23, r16        
+      mov r23, r16
+      sbi portb, portb0      
       rjmp main
 main:
     rcall leer_seleccion
@@ -38,11 +39,33 @@ m_check_inicio:
     rcall leer_inicio
     cpi   r21, 1
     brne  main
+    cpi r23, 255
+    breq main
     rcall verificar_listo
     cpi r26, 1
     brne main
-    sbi   portb, portb0        
-    rjmp  main
+    
+    cbi portb, portb0
+    
+    sbi portb, portb1
+    rcall lavado
+    cbi portb, portb1
+    
+    sbi portb, portb2
+    rcall centrifugado
+    cbi portb, portb2
+    
+    sbi portb, portb3
+    rcall secado
+    cbi portb, portb3
+    
+    sbi portb, portb4
+    ldi r20, 5
+    rcall delay_seg
+    cbi portb, portb4
+    
+    sbi portb, portb0
+    rjmp main
       
 Leer_inicio:
       ldi r21, 0

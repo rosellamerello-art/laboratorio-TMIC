@@ -26,18 +26,18 @@ RESET:
     ldi temporal, 0b00000001
     out DDRB, temporal
 
-    ldi temporal, 0b00000010
+    ldi temporal, 0b00000110
     out PORTB, temporal
 
     clr contador
     rcall MOSTRAR_DIGITO
 
 PRINCIPAL:
+    ; Revisar botón Incrementar en PB1.
     sbic PINB, PB1
-    rjmp PRINCIPAL
+    rjmp REVISAR_DECREMENTO
 
     rcall RETARDO
-
     sbic PINB, PB1
     rjmp PRINCIPAL
 
@@ -46,12 +46,36 @@ PRINCIPAL:
     brlo MOSTRAR
 
     clr contador
+    rjmp MOSTRAR
+
+REVISAR_DECREMENTO:
+    ; Revisar botón Decrementar en PB2.
+    sbic PINB, PB2
+    rjmp PRINCIPAL
+
+    rcall RETARDO
+    sbic PINB, PB2
+    rjmp PRINCIPAL
+
+    ; Si el contador está en 0, pasa a 9.
+    tst contador
+    brne RESTAR
+
+    ldi contador, 9
+    rjmp MOSTRAR
+
+RESTAR:
+    dec contador
 
 MOSTRAR:
     rcall MOSTRAR_DIGITO
 
 ESPERAR_SOLTAR:
+    ; Espera a que se liberen ambos botones.
     sbis PINB, PB1
+    rjmp ESPERAR_SOLTAR
+
+    sbis PINB, PB2
     rjmp ESPERAR_SOLTAR
 
     rcall RETARDO
@@ -71,7 +95,7 @@ MOSTRAR_DIGITO:
     adc ZH, r1
     lpm patron, Z
 
-    ori patron, 0b00000010
+    ori patron, 0b00000110
     out PORTB, patron
     ret
 

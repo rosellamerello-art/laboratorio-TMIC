@@ -33,7 +33,6 @@ RESET:
     rcall MOSTRAR_DIGITO
 
 PRINCIPAL:
-    ; Revisar botón Incrementar en PB1.
     sbic PINB, PB1
     rjmp REVISAR_DECREMENTO
 
@@ -49,7 +48,6 @@ PRINCIPAL:
     rjmp MOSTRAR
 
 REVISAR_DECREMENTO:
-    ; Revisar botón Decrementar en PB2.
     sbic PINB, PB2
     rjmp PRINCIPAL
 
@@ -57,7 +55,6 @@ REVISAR_DECREMENTO:
     sbic PINB, PB2
     rjmp PRINCIPAL
 
-    ; Si el contador está en 0, pasa a 9.
     tst contador
     brne RESTAR
 
@@ -71,7 +68,6 @@ MOSTRAR:
     rcall MOSTRAR_DIGITO
 
 ESPERAR_SOLTAR:
-    ; Espera a que se liberen ambos botones.
     sbis PINB, PB1
     rjmp ESPERAR_SOLTAR
 

@@ -12,7 +12,6 @@
 
 RESET:
     cli
-
    
     ldi temporal, high(RAMEND)
     out SPH, temporal
@@ -21,29 +20,44 @@ RESET:
 
     clr r1
 
-   
     ldi temporal, 0b11111100
     out DDRD, temporal
-
 
     ldi temporal, 0b00000001
     out DDRB, temporal
 
-  
-    ldi temporal, 0b00001110
+    ldi temporal, 0b00000010
     out PORTB, temporal
 
+    clr contador
+    rcall MOSTRAR_DIGITO
+
+PRINCIPAL:
+    sbic PINB, PB1
+    rjmp PRINCIPAL
+
+    rcall RETARDO
+
+    sbic PINB, PB1
+    rjmp PRINCIPAL
+
+    inc contador
+    cpi contador, 10
+    brlo MOSTRAR
 
     clr contador
 
- 
+MOSTRAR:
     rcall MOSTRAR_DIGITO
 
-BUCLE:
-    rjmp BUCLE
+ESPERAR_SOLTAR:
+    sbis PINB, PB1
+    rjmp ESPERAR_SOLTAR
+
+    rcall RETARDO
+    rjmp PRINCIPAL
 
 MOSTRAR_DIGITO:
-
     ldi ZH, high(TABLA_PORTD * 2)
     ldi ZL, low(TABLA_PORTD * 2)
     add ZL, contador
@@ -51,17 +65,34 @@ MOSTRAR_DIGITO:
     lpm patron, Z
     out PORTD, patron
 
-
     ldi ZH, high(TABLA_PORTB * 2)
     ldi ZL, low(TABLA_PORTB * 2)
     add ZL, contador
     adc ZH, r1
     lpm patron, Z
 
-
-    ori patron, 0b00001110
+    ori patron, 0b00000010
     out PORTB, patron
+    ret
 
+RETARDO:
+    ldi r20, 2
+
+RETARDO_1:
+    ldi r21, 255
+
+RETARDO_2:
+    ldi r22, 210
+
+RETARDO_3:
+    dec r22
+    brne RETARDO_3
+
+    dec r21
+    brne RETARDO_2
+
+    dec r20
+    brne RETARDO_1
     ret
 
 TABLA_PORTD:

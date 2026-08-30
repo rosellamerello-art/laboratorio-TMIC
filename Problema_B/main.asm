@@ -26,13 +26,24 @@ RESET:
     ldi temporal, 0b00000001
     out DDRB, temporal
 
-    ldi temporal, 0b00000110
+    ldi temporal, 0b00001110
     out PORTB, temporal
 
     clr contador
     rcall MOSTRAR_DIGITO
 
 PRINCIPAL:
+    sbic PINB, PB3
+    rjmp REVISAR_INCREMENTO
+
+    rcall RETARDO
+    sbic PINB, PB3
+    rjmp PRINCIPAL
+
+    clr contador
+    rjmp MOSTRAR
+
+REVISAR_INCREMENTO:
     sbic PINB, PB1
     rjmp REVISAR_DECREMENTO
 
@@ -74,6 +85,9 @@ ESPERAR_SOLTAR:
     sbis PINB, PB2
     rjmp ESPERAR_SOLTAR
 
+    sbis PINB, PB3
+    rjmp ESPERAR_SOLTAR
+
     rcall RETARDO
     rjmp PRINCIPAL
 
@@ -91,7 +105,7 @@ MOSTRAR_DIGITO:
     adc ZH, r1
     lpm patron, Z
 
-    ori patron, 0b00000110
+    ori patron, 0b00001110
     out PORTB, patron
     ret
 

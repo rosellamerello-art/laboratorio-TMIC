@@ -37,8 +37,19 @@ RESET:
 
 MAIN:
     rcall LEER_ENTRADAS
-    
+    rcall OPERAR
+    rcall ACTUALIZAR_SALIDAS
+    rcall RETARDO_DEBOUNCE
     rjmp  MAIN
+
+    RETARDO_DEBOUNCE:
+    ldi   r23, 50
+D1: ldi   r24, 255
+D2: dec   r24
+    brne  D2
+    dec   r23
+    brne  D1
+    ret
 
 LEER_ENTRADAS:
     
@@ -143,4 +154,28 @@ GUARDAR:
 NO_ZERO:
 
 FIN_OP:
+    ret
+
+ACTUALIZAR_SALIDAS:
+    
+    clr   temp
+    sbrc  rFlags, 0
+    ori   temp, 0b00010000      
+    sbrc  rFlags, 1
+    ori   temp, 0b00100000      
+    sbrc  rFlags, 2
+    ori   temp, 0b01000000      
+    or    temp, rF              
+    out   PORTB, temp
+
+    in    temp, PORTC           
+    andi  temp, 0b00001111      
+    mov   r22, rS
+    lsl   r22
+    lsl   r22
+    lsl   r22
+    lsl   r22                  
+    or    temp, r22
+    out   PORTC, temp
+
     ret

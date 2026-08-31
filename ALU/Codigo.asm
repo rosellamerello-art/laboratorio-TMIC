@@ -62,3 +62,85 @@ LEER_ENTRADAS:
     mov   rS, temp
 
     ret
+    
+OPERAR:
+    cpi   rS, 0
+    breq  OP_CLEAR
+    cpi   rS, 1
+    breq  OP_SUB
+    cpi   rS, 2
+    breq  OP_ADD
+    cpi   rS, 3
+    breq  OP_XOR
+    cpi   rS, 4
+    breq  OP_AND
+    cpi   rS, 5
+    breq  OP_OR
+    cpi   rS, 6
+    breq  OP_SHL
+    cpi   rS, 7
+    breq  OP_INC
+    rjmp  FIN_OP
+
+OP_CLEAR:
+    clr   temp
+    clr   rFlags
+    rjmp  GUARDAR
+
+OP_SUB:
+    mov   temp, rA
+    sub   temp, rB
+    rjmp  CALC_CARRY
+
+OP_ADD:
+    mov   temp, rA
+    add   temp, rB
+    rjmp  CALC_CARRY
+
+OP_XOR:
+    mov   temp, rA
+    eor   temp, rB
+    clr   rFlags        
+    rjmp  GUARDAR
+
+OP_AND:
+    mov   temp, rA
+    and   temp, rB
+    clr   rFlags
+    rjmp  GUARDAR
+
+OP_OR:
+    mov   temp, rA
+    or    temp, rB
+    clr   rFlags
+    rjmp  GUARDAR
+
+OP_SHL:
+    mov   temp, rA
+    add   temp, rA      
+    rjmp  CALC_CARRY
+
+OP_INC:
+    mov   temp, rA
+    subi  temp, 0xFF    
+    rjmp  CALC_CARRY
+
+CALC_CARRY:
+    clr   rFlags
+    sbrc  temp, 4               
+    ori   rFlags, 0b00000001    
+
+GUARDAR:
+    andi  temp, 0x0F            
+    mov   rF, temp
+
+    sbrc  rF, 3                 
+    ori   rFlags, 0b00000010
+
+    cpi   rF, 0
+    brne  NO_ZERO
+    ori   rFlags, 0b00000100    
+NO_ZERO:
+
+FIN_OP:
+    ret

@@ -19,13 +19,13 @@ RESET:
     out   SPH, temp
 
     
-    ldi   temp, 0b01111111
+    ldi   temp, 0b00111111
     out   DDRB, temp
     clr   temp
     out   PORTB, temp
 
     
-    ldi   temp, 0b01110000
+    ldi   temp, 0b00010000
     out   DDRC, temp
     ldi   temp, 0b00001111      
     out   PORTC, temp
@@ -55,21 +55,18 @@ LEER_ENTRADAS:
     
     in    temp, PINC
     andi  temp, 0b00001111
-    com   temp
-    andi  temp, 0b00001111
     mov   rA, temp
 
     in    temp, PIND
-    andi  temp, 0b00001111
-    com   temp
     andi  temp, 0b00001111
     mov   rB, temp
 
     in    temp, PIND
     andi  temp, 0b01110000
-    swap  temp                 
-    com   temp
-    andi  temp, 0b00000111
+    lsr temp
+    lsr temp
+    lsr temp
+    lsr temp
     mov   rS, temp
 
     ret
@@ -163,19 +160,15 @@ ACTUALIZAR_SALIDAS:
     ori   temp, 0b00010000      
     sbrc  rFlags, 1
     ori   temp, 0b00100000      
-    sbrc  rFlags, 2
-    ori   temp, 0b01000000      
+        
     or    temp, rF              
     out   PORTB, temp
 
-    in    temp, PORTC           
-    andi  temp, 0b00001111      
-    mov   r22, rS
-    lsl   r22
-    lsl   r22
-    lsl   r22
-    lsl   r22                  
-    or    temp, r22
-    out   PORTC, temp
+    in temp, PORTC
+    andi temp, 0b00001111
+    sbrc rFlags, 2
+    ori temp, 0b00010000
+    out PORTC, temp
+
 
     ret
